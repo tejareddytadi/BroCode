@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Playground</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Coding Platform</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="problems.html">Problems</a></li>
+                <li><a href="contest.html">Contests</a></li>
+                <li><a href="playground.html">Playground</a></li>
+                <li><a href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="control-panel">
+        <select id="language" onchange="changeLanguage()">
+            <option value="c_cpp">C/C++</option>
+            <option value="java">Java</option>
+            <option value="python">Python</option>
+            <option value="javascript">JavaScript</option>
+        </select>
+        <button onclick="runCode()">Run Code</button>
+    </div>
+    <div style="display: flex; width: 100%; height: 70vh;">
+        <div id="editor" style="flex-grow: 1; height: 100%;"></div>
+        <div style="flex-grow: 1; height: 100%; background-color: #f4f4f4; overflow: auto; padding: 10px;">
+            <pre id="output">Click 'Run Code' to execute...</pre>
+        </div>
+    </div>
+    <div class="input-panel" style="margin-top: 20px;">
+        <textarea id="userInput" placeholder="Enter input here..." style="width: 100%; height: 100px;"></textarea>
+    </div>
+    <footer>
+        &copy; 2024 Coding Platform. All rights reserved.
+    </footer>
+    <script>
+        var editor = ace.edit("editor");
+        editor.setTheme("ace/theme/monokai");
+        editor.session.setMode("ace/mode/c_cpp");
+
+        function changeLanguage() {
+            var language = document.getElementById("language").value;
+            editor.session.setMode("ace/mode/" + language);
+        }
+
+        function runCode() {
+    var code = editor.getValue();
+    var language = document.getElementById('language').value;
+    var userInput = document.getElementById('userInput').value;
+    var outputArea = document.getElementById('output');
+    outputArea.textContent = "Running...\n";
+
+    fetch('/api/run-code', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ code, language, userInput })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            outputArea.textContent = "Error: " + data.error;
+        } else {
+            outputArea.textContent = "Output:\n" + data.result;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        outputArea.textContent = "An error occurred while trying to execute the code.";
+    });
+}
+
+    </script>
+</body>
+</html>

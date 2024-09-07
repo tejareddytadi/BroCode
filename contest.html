@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contests - Coding Platform</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        async function fetchContests() {
+            try {
+                const response = await fetch('http://localhost:3000/api/contests');
+                const contests = await response.json();
+                const contestsList = document.getElementById('contests-list');
+                contests.forEach(contest => {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `
+                        <strong>${contest.name}</strong> - Starts on: ${new Date(contest.startDate).toLocaleString()}
+                        <button onclick="window.location.href='contest-detail.html?contestId=${contest._id}'">Start Contest</button>
+                    `;
+                    contestsList.appendChild(listItem);
+                });
+            } catch (error) {
+                console.error('Error fetching contests:', error);
+            }
+        }
+    
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchContests();
+        });
+    </script>
+    
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Coding Platform</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="problems.html">Problems</a></li>
+                <li><a href="contest.html">Contests</a></li>
+                <li><a href="playground.html">Playground</a></li>
+                <li><a href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="container">
+        <h1>Current Contests</h1>
+        <ul id="contests-list"></ul>
+        <button onclick="window.location.href='create-contest.html'">Create Custom Contest</button>
+    </div>
+    <footer>
+        <p>&copy; 2024 Coding Platform</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Area</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="problems.html">Problems</a></li>
+            <li><a href="contests.html">Contests</a></li>
+            <li><a href="code-editor.html">Code Area</a></li>
+            <li class="right"><a href="login.html">Login</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h1>Code Area</h1>
+        <textarea placeholder="Write your code here..."></textarea>
+        <button onclick="runCode()">Run Code</button>
+        <div id="output"></div>
+    </main>
+
+    <script>
+        function runCode() {
+            const code = document.querySelector('textarea').value;
+            // For now, we'll just display the code in the output as a placeholder
+            document.getElementById('output').innerText = "Output:\n" + code;
+        }
+    </script>
+</body>
+</html>

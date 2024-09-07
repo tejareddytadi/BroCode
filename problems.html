@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coding Problems</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        async function fetchProblems() {
+            try {
+                const response = await fetch('http://localhost:3000/api/problems');
+                let problems = await response.json();
+                displayProblems(problems);
+            } catch (error) {
+                console.error('Error fetching problems:', error);
+            }
+        }
+
+        function displayProblems(problems) {
+            const problemsList = document.getElementById('problems-list');
+            problemsList.innerHTML = '';  // Clear existing entries
+            problems.forEach(problem => {
+                const listItem = document.createElement('li');
+                const link = document.createElement('a');
+                const span = document.createElement('span');
+
+                link.href = `problem-detail.html?id=${problem._id}`;
+                link.textContent = problem.name;
+                span.textContent = ` (${problem.level})`;
+                span.style.float = 'right';
+
+                listItem.appendChild(link);
+                link.appendChild(span);
+                problemsList.appendChild(listItem);
+            });
+        }
+
+        function sortProblems() {
+            fetch('http://localhost:3000/api/problems')
+                .then(response => response.json())
+                .then(problems => {
+                    problems.sort((a, b) => a.level.localeCompare(b.level));  // Assuming 'level' is a string like 'Easy', 'Medium', 'Hard'
+                    displayProblems(problems);
+                })
+                .catch(error => console.error('Error sorting problems:', error));
+        }
+
+        window.onload = fetchProblems;
+    </script>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Coding Platform</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="problems.html">Problems</a></li>
+                <li><a href="contest.html">Contests</a></li>
+                <li><a href="playground.html">Playground</a></li>
+                <li><a href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="container">
+        <h2>Available Problems</h2>
+        <button onclick="sortProblems()">Sort by Difficulty</button>
+        <button onclick="location.href='submit-problem.html'" style="margin-left: 10px;">Submit a New Problem</button>
+        <ul id="problems-list">
+            <!-- Problem links with difficulty levels will be dynamically inserted here -->
+        </ul>
+    </div>
+    <footer>
+        <p>&copy; 2024 Coding Platform</p>
+    </footer>
+</body>
+</html>

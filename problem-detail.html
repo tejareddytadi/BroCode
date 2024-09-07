@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problem Detail</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Problem Details</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="problems.html">Problems</a></li>
+                <li><a href="contest.html">Contests</a></li>
+                <li><a href="playground.html">Playground</a></li>
+                <li><a href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="container">
+        <h2 id="problem-name">Problem Name</h2>
+        <p id="problem-description">Problem Description</p>
+        <p id="problem-constraints">Constraints</p>
+        <p id="problem-level">Level</p>
+        <h3>Test Cases</h3>
+        <ul id="testcases-list">
+            <!-- Test case details will be dynamically inserted here -->
+        </ul>
+        <h3>Code Editor</h3>
+        <div id="editor" style="height: 300px; width: 100%;"></div>
+        <div class="control-panel">
+            <select id="language" onchange="changeLanguage()">
+                <option value="c_cpp">C/C++</option>
+                <option value="java">Java</option>
+                <option value="python">Python</option>
+                <option value="javascript">JavaScript</option>
+            </select>
+            <button onclick="runCode()">Run Code</button>
+        </div>
+        <div id="output-area" class="output" style="margin-top: 20px; padding: 10px; background-color: #f4f4f4;">
+            Output will be displayed here...
+        </div>
+        <button onclick="window.location.href='problems.html'">Back to Problems List</button>
+    </div>
+    <footer>
+        <p>&copy; 2024 Coding Platform</p>
+    </footer>
+    <script>
+        var editor = ace.edit("editor");
+        editor.setTheme("ace/theme/monokai");
+        editor.session.setMode("ace/mode/python"); // Default to Python for ease of use
+
+        function changeLanguage() {
+            var language = document.getElementById("language").value;
+            editor.session.setMode("ace/mode/" + language);
+        }
+
+        async function fetchProblemDetails() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const problemId = urlParams.get('id');
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/problems`);
+                const problems = await response.json();
+                const problem = problems.find(prob => prob._id === problemId);
+
+                if (problem) {
+                    document.getElementById('problem-name').textContent = problem.name;
+                    document.getElementById('problem-description').textContent = problem.description;
+                    document.getElementById('problem-constraints').textContent = `Constraints: ${problem.constraints}`;
+                    document.getElementById('problem-level').textContent = `Level: ${problem.level}`;
+
+                    const testcasesList = document.getElementById('testcases-list');
+                    testcasesList.innerHTML = ''; // Clear existing test cases
+                    problem.testcases.forEach(testcase => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `Input: ${testcase.input}, Expected Output: ${testcase.output}`;
+                        testcasesList.appendChild(listItem);
+                    });
+                } else {
+                    document.getElementById('problem-name').textContent = 'Problem not found';
+                }
+            } catch (error) {
+                console.error('Error fetching problem details:', error);
+            }
+        }
+
+        function runCode() {
+            var code = editor.getValue();
+            var language = document.getElementById('language').value;
+            var outputArea = document.getElementById('output-area');
+            outputArea.textContent = "Running...\n";
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const problemId = urlParams.get('id');
+
+            fetch('/api/run-code', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ code, language, problemId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    outputArea.textContent = "Error: " + data.error;
+                } else {
+                    let resultHTML = '';
+                    data.forEach(testCase => {
+                        resultHTML += `<strong>Input:</strong> ${testCase.input}<br>`;
+                        resultHTML += `<strong>Expected Output:</strong> ${testCase.expectedOutput}<br>`;
+                        resultHTML += `<strong>Actual Output:</strong> ${testCase.actualOutput}<br>`;
+                        resultHTML += `<strong>Result:</strong> ${testCase.isCorrect ? 'Correct' : 'Wrong'}<br><br>`;
+                    });
+                    outputArea.innerHTML = resultHTML;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                outputArea.textContent = "An error occurred while trying to execute the code.";
+            });
+        }
+
+        window.onload = fetchProblemDetails;
+    </script>
+</body>
+</html>

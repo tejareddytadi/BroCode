@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contest Details</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        async function fetchContestDetails() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const contestId = urlParams.get('contestId');
+            if (!contestId) {
+                console.error('No contest ID provided in URL.');
+                return;
+            }
+
+            try {
+                // Fetch the specific contest details
+                const response = await fetch(`http://localhost:3000/api/contests/${contestId}`);
+                const contest = await response.json();
+
+                if (contest && contest.problems) {
+                    fetchProblemsDetails(contest.problems);
+                } else {
+                    console.error('No problems found for this contest.');
+                }
+            } catch (error) {
+                console.error('Error fetching contest details:', error);
+            }
+        }
+
+        async function fetchProblemsDetails(problemIds) {
+            const problemsDetails = await Promise.all(problemIds.map(id =>
+                fetch(`http://localhost:3000/api/problems/${id}`)
+                    .then(response => response.json())
+            ));
+
+            displayContestProblems(problemsDetails);
+        }
+
+        function displayContestProblems(problems) {
+            const problemsList = document.getElementById('problems-list');
+            problemsList.innerHTML = '';  // Clear previous entries
+            problems.forEach(problem => {
+                const listItem = document.createElement('li');
+                const link = document.createElement('a');
+                link.href = `problem-detail.html?id=${problem._id}`;  // Ensure you have a proper URL structure in your routing
+                link.textContent = problem.name;
+                listItem.appendChild(link);
+                problemsList.appendChild(listItem);
+            });
+        }
+
+        window.onload = fetchContestDetails;
+    </script>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Coding Platform</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="problems.html">Problems</a></li>
+                <li><a href="contest.html">Contests</a></li>
+                <li><a href="playground.html">Playground</a></li>
+                <li><a href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="container">
+        <h2>Contest Problems</h2>
+        <ul id="problems-list">
+            <!-- Dynamically filled with problem names and links to their detail pages -->
+        </ul>
+    </div>
+    <footer>
+        <p>&copy; 2024 Coding Platform</p>
+    </footer>
+</body>
+</html>

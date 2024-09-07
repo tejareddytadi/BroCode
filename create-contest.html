@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Custom Contest - Coding Platform</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        async function fetchContestDetails() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const contestId = urlParams.get('contestId');
+            if (!contestId) {
+                console.error('No contest ID provided in URL.');
+                return;
+            }
+            try {
+                const response = await fetch(`http://localhost:3000/api/contests/${contestId}`);
+                const contest = await response.json();
+                if (contest.problems) {
+                    displayContestProblems(contest.problems);
+                } else {
+                    console.error('No problems found for this contest.');
+                }
+            } catch (error) {
+                console.error('Error fetching contest details:', error);
+            }
+        }
+    
+        function displayContestProblems(problems) {
+            const problemsList = document.getElementById('problems-list');
+            problemsList.innerHTML = '';  // Clear existing entries
+            problems.forEach(problem => {
+                const listItem = document.createElement('li');
+                const link = document.createElement('a');
+                link.href = `problem-detail.html?id=${problem._id}`;
+                link.textContent = problem.name;
+                listItem.appendChild(link);
+                problemsList.appendChild(listItem);
+            });
+        }
+    
+        window.onload = fetchContestDetails;
+    </script>
+    
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Coding Platform</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="problems.html">Problems</a></li>
+                <li><a href="contest.html">Contests</a></li>
+                <li><a href="playground.html">Playground</a></li>
+                <li><a href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="container">
+        <h1>Create Custom Contest</h1>
+        <form onsubmit="event.preventDefault(); submitContest();">
+            <label for="contest-name">Contest Name:</label>
+            <input type="text" id="contest-name" required><br>
+
+            <label for="contest-date">Start Date:</label>
+            <input type="datetime-local" id="contest-date" required><br>
+
+            <label>Select Problems:</label>
+            <div id="problems-list"></div><br>
+
+            <label for="contest-lock">Lock Contest:</label>
+            <input type="checkbox" id="contest-lock"><br>
+
+            <button type="submit">Create Contest</button>
+        </form>
+    </div>
+    <footer>
+        <p>&copy; 2024 Your Coding Platform</p>
+    </footer>
+</body>
+</html>

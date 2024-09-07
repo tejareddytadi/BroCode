@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit New Problem</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        function submitProblem() {
+            const formData = {
+                name: document.getElementById('name').value,
+                description: document.getElementById('description').value,
+                level: document.getElementById('level').value,
+                // Add other fields as necessary
+            };
+
+            fetch('http://localhost:3000/api/problems', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Problem added successfully!');
+                window.location.href = 'problems.html'; // Redirect after submission
+            })
+            .catch(error => {
+                console.error('Error adding problem:', error);
+            });
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Coding Platform</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="problems.html">Problems</a></li>
+                <li><a href="contest.html">Contests</a></li>
+                <li><a href="ai-bot.html">AI Bot</a></li>
+                <li><a href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="container">
+        <h2>Submit a New Problem</h2>
+        <form onsubmit="event.preventDefault(); submitProblem();">
+            <label for="name">Problem Name:</label>
+            <input type="text" id="name" required><br>
+            <label for="description">Description:</label>
+            <textarea id="description" required></textarea><br>
+            <label for="level">Difficulty Level:</label>
+            <select id="level">
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
+            </select><br>
+            <button type="submit">Submit Problem</button>
+        </form>
+    </div>
+    <footer>
+        <p>&copy; 2024 Your Coding Platform</p>
+    </footer>
+</body>
+</html>
